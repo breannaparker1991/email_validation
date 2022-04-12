@@ -20,7 +20,7 @@ def new():
 
 @app.route('/show')
 def show():
-  return render_template("show.html", email = Email.show())
+  return render_template("show.html", emails = Email.show())
 
 @app.route('/delete/<int:id>')
 def delete(id):

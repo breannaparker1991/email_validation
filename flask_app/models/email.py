@@ -1,11 +1,7 @@
-EMAIL_REGEX = re.compile(r'^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]+$')
-from unittest import result
-from winreg import QueryInfoKey
-from wsgiref import validate
 from flask import flash
 import re
-from flask_app import app
 from flask_app.config.mysqlconnection import connectToMySQL
+EMAIL_REGEX = re.compile(r'^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]+$')
 
 class Email:
   db = "email_validation"
@@ -17,7 +13,7 @@ class Email:
 
   @classmethod
   def create(cls,data):
-    query = "INSERT INTO email_validation(name, created_at) VALUES (%(email)s, NOW())"
+    query = "INSERT INTO email_validation(email, created_at) VALUES (%(email)s, NOW())"
     result = connectToMySQL(cls.db).query_db(query,data)
     return result
 
@@ -41,17 +37,12 @@ class Email:
     validate = True
     query = "SELECT * FROM email_validation WHERE email = %(email)s"
     results = connectToMySQL(Email.db).query_db(query,email)
-    if len(results) >= 1:
+    if EMAIL_REGEX.match(email['email']):
       flash("Email is already taken!")
       validate = False
-    if not EMAIL_REGEX.match(email['email']):
+    elif not EMAIL_REGEX.match(email['email']):
       flash('Invalid Email')
       validate = False
+    else:
+      flash('the email addres you entered:  ' + (email['email']) + '   is a VALID email address! THANK YOU!!!')
     return validate
-    
-    # validate = True
-    # if not EMAIL_REGEX.match(email['email']):
-    #   flash("EMAIL NOT VALID!!!")
-    #   validate = False
-    # return validate
-  
